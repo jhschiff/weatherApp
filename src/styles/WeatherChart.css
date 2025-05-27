@@ -1,0 +1,52 @@
+.weather-chart-container {
+  padding: 24px;
+  height: 100%;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.weather-chart-container:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.weather-chart-header {
+  margin-bottom: 24px;
+}
+
+.weather-chart-title {
+  color: var(--primary-main);
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.weather-chart-description {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.weather-stats-grid {
+  margin-bottom: 16px;
+}
+
+.weather-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-stat-icon {
+  margin-right: 8px;
+}
+
+.weather-chart-wrapper {
+  height: 400px;
+  position: relative;
+}
+
+.loading-container {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+} 

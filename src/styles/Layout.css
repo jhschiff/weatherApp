@@ -1,0 +1,60 @@
+.title {
+  font-weight: 700;
+  color: #1976d2;  /* Material-UI's default primary blue */
+  margin-bottom: 1rem;
+  letter-spacing: -0.25px;
+  font-size: 2.75rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  font-size: 1.125rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.subtitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background-color: var(--background-paper);
+  border-radius: 4px;
+  padding: 2rem;
+}
+
+.empty-state-text {
+  color: var(--text-secondary);
+}
+
+.search-container {
+  margin-bottom: 2rem;
+}
+
+.error-alert {
+  margin-bottom: 1rem;
+} 
