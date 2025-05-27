@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { format, addDays } from 'date-fns';
+import { format, addDays, isAfter, startOfDay } from 'date-fns';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
@@ -37,13 +37,18 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek }) => {
       return null;
     }
 
-    // Find the forecast for the selected event day
-    const eventDayData = weatherData.days.find(day => {
-      const dayDate = new Date(day.datetime);
-      const dayOfWeek = format(dayDate, 'EEEE').toLowerCase();
-      const isNextWeekDay = dayDate > addDays(new Date(), 7);
-      return dayOfWeek === eventDay && isNextWeekDay === isNextWeek;
-    });
+    // Find the next two occurrences of the selected event day
+    const today = startOfDay(new Date());
+    const matchingDays = weatherData.days
+      .filter(day => {
+        const dayDate = new Date(day.datetime);
+        const dayOfWeek = format(dayDate, 'EEEE').toLowerCase();
+        return dayOfWeek === eventDay && isAfter(dayDate, today);
+      })
+      .slice(0, 2); // Get only the next two occurrences
+
+    // Select the appropriate day based on isNextWeek
+    const eventDayData = isNextWeek ? matchingDays[1] : matchingDays[0];
 
     if (!eventDayData?.hours) {
       console.log('No hours data for selected day');
