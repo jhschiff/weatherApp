@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
 import { Box, Paper, CircularProgress, useTheme, Typography } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
@@ -16,13 +17,14 @@ import '../styles/WeatherChart.css';
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend
 );
 
-const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset }) => {
+const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) => {
   const theme = useTheme();
 
   const chartData = useMemo(() => {
@@ -30,28 +32,69 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
     if (!eventDayData) return null;
 
     return {
-      labels: ['Temperature'],
+      labels: ['Temperature', 'Precipitation', 'Humidity', 'Wind Speed'],
       datasets: [
         {
           label: 'Max Temperature',
-          data: [eventDayData.tempmax],
-          backgroundColor: theme.palette.error.light,
+          data: [eventDayData.tempmax, null, null, null],
           borderColor: theme.palette.error.main,
-          borderWidth: 1,
+          backgroundColor: 'rgba(211, 47, 47, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y',
         },
         {
           label: 'Average Temperature',
-          data: [eventDayData.temp],
-          backgroundColor: theme.palette.error.main,
-          borderColor: theme.palette.error.dark,
-          borderWidth: 1,
+          data: [eventDayData.temp, null, null, null],
+          borderColor: theme.palette.primary.main,
+          backgroundColor: 'rgba(25, 118, 210, 0.2)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          yAxisID: 'y',
         },
         {
           label: 'Min Temperature',
-          data: [eventDayData.tempmin],
-          backgroundColor: theme.palette.error.light,
-          borderColor: theme.palette.error.main,
-          borderWidth: 1,
+          data: [eventDayData.tempmin, null, null, null],
+          borderColor: theme.palette.info.main,
+          backgroundColor: 'rgba(2, 136, 209, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Precipitation Chance',
+          data: [null, eventDayData.precipprob, null, null],
+          borderColor: theme.palette.info.light,
+          backgroundColor: 'rgba(2, 136, 209, 0.05)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y1',
+        },
+        {
+          label: 'Humidity',
+          data: [null, null, eventDayData.humidity, null],
+          borderColor: theme.palette.success.main,
+          backgroundColor: 'rgba(46, 125, 50, 0.05)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y1',
+        },
+        {
+          label: 'Wind Speed',
+          data: [null, null, null, eventDayData.windspeed],
+          borderColor: theme.palette.warning.main,
+          backgroundColor: 'rgba(237, 108, 2, 0.05)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y2',
         }
       ],
       date: eventDayData.datetime,
@@ -82,7 +125,7 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
         labels: {
           padding: 20,
           usePointStyle: true,
-          pointStyle: 'rect',
+          pointStyle: 'circle',
           font: {
             size: 12,
             weight: 'bold',
@@ -106,14 +149,36 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
           size: 13,
         },
         callbacks: {
-          title: (items) => `Temperature Range`,
-          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(1)}°F`,
+          title: (items) => items[0].label,
+          label: (context) => {
+            const value = context.parsed.y;
+            if (value === null) return null;
+            const label = context.dataset.label;
+            if (label.includes('Temperature')) {
+              return `${label}: ${value.toFixed(1)}°F`;
+            } else if (label.includes('Precipitation') || label.includes('Humidity')) {
+              return `${label}: ${value}%`;
+            } else {
+              return `${label}: ${value} mph`;
+            }
+          },
         },
       },
     },
     scales: {
       y: {
-        beginAtZero: false,
+        type: 'linear',
+        display: true,
+        position: 'left',
+        title: {
+          display: true,
+          text: 'Temperature (°F)',
+          color: theme.palette.error.main,
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+        },
         grid: {
           color: theme.palette.divider,
           drawBorder: false,
@@ -123,6 +188,63 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
           padding: 8,
           callback: (value) => `${value}°F`,
         },
+        suggestedMin: (context) => {
+          const minTemp = Math.min(...context.chart.data.datasets.slice(0, 3).map(d => d.data[0]).filter(v => v !== null));
+          return Math.floor(minTemp - 5);
+        },
+        suggestedMax: (context) => {
+          const maxTemp = Math.max(...context.chart.data.datasets.slice(0, 3).map(d => d.data[0]).filter(v => v !== null));
+          return Math.ceil(maxTemp + 5);
+        }
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: {
+          display: true,
+          text: 'Percentage (%)',
+          color: theme.palette.info.main,
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+        },
+        grid: {
+          drawOnChartArea: false,
+          drawBorder: false,
+        },
+        ticks: {
+          font: { size: 11 },
+          padding: 8,
+          callback: (value) => `${value}%`,
+        },
+        min: 0,
+        max: 100,
+      },
+      y2: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        title: {
+          display: true,
+          text: 'Wind Speed (mph)',
+          color: theme.palette.warning.main,
+          font: {
+            size: 12,
+            weight: 'bold',
+          },
+        },
+        grid: {
+          drawOnChartArea: false,
+          drawBorder: false,
+        },
+        ticks: {
+          font: { size: 11 },
+          padding: 8,
+          callback: (value) => `${value} mph`,
+        },
+        min: 0,
       },
       x: {
         grid: {
@@ -132,6 +254,9 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
           font: { size: 11 },
           padding: 8,
         },
+        offset: true,
+        min: -0.5,
+        max: 3.5
       },
     },
   };
@@ -159,8 +284,8 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
       >
         * Based on historical weather averages for this time period
       </Typography>
-      <Box className="weather-chart-wrapper">
-        <Bar options={options} data={chartData} />
+      <Box className="weather-chart-wrapper" sx={{ px: 4 }}>
+        <Line options={options} data={chartData} />
       </Box>
     </Paper>
   );
