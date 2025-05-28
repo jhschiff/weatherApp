@@ -1,4 +1,8 @@
 import { format, parseISO } from 'date-fns';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import CloudIcon from '@mui/icons-material/Cloud';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import { useTheme } from '@mui/material';
 
 export const getWeatherDescription = (summary) => {
   const { avgTemp, avgPrecip, avgHumidity, avgWind } = summary;
@@ -45,4 +49,22 @@ export const getEventDayData = (weatherData, eventDay, weekOffset, isNextWeek) =
 
   // Get the appropriate day
   return matchingDays[index];
+};
+
+export const WeatherIcon = ({ icon }) => {
+  const theme = useTheme();
+  const iconSize = 48;
+  
+  switch (icon) {
+    case 'partly-cloudy-day':
+      return <CloudIcon sx={{ fontSize: iconSize, color: theme.palette.primary.main }} />;
+    case 'clear-day':
+      return <WbSunnyIcon sx={{ fontSize: iconSize, color: theme.palette.warning.main }} />;
+    case 'rain':
+      return <WaterDropIcon sx={{ fontSize: iconSize, color: theme.palette.info.main }} />;
+    case 'thunder-rain':
+      return <WaterDropIcon sx={{ fontSize: iconSize, color: theme.palette.error.main }} />;
+    default:
+      return <CloudIcon sx={{ fontSize: iconSize, color: theme.palette.primary.main }} />;
+  }
 }; 

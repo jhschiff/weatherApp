@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { format, addDays } from 'date-fns';
 import weatherApi from '../services/weatherApi';
+import mockWeatherData from '../mocks/weatherData';
 
 const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [maxWeeksFetched, setMaxWeeksFetched] = useState(0);
+
+  // Use mock data in development
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   // Fetch data when location changes or when we need more future data
   useEffect(() => {
@@ -22,15 +26,21 @@ const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
       setError(null);
 
       try {
-        // Calculate how many weeks of data we need based on weekOffset
-        const weeksToFetch = Math.max(4, 4 + weekOffset);
-        const today = new Date();
-        const startDate = format(today, 'yyyy-MM-dd');
-        const endDate = format(addDays(today, weeksToFetch * 7), 'yyyy-MM-dd');
+        if (isDevelopment) {
+          // Use mock data in development
+          setWeatherData(mockWeatherData);
+          setMaxWeeksFetched(2); // Mock data has 2 weeks
+        } else {
+          // Calculate how many weeks of data we need based on weekOffset
+          const weeksToFetch = Math.max(4, 4 + weekOffset);
+          const today = new Date();
+          const startDate = format(today, 'yyyy-MM-dd');
+          const endDate = format(addDays(today, weeksToFetch * 7), 'yyyy-MM-dd');
 
-        const data = await weatherApi.getForecast(location, startDate, endDate);
-        setWeatherData(data);
-        setMaxWeeksFetched(weeksToFetch / 2); // Store how many pairs of weeks we've fetched
+          const data = await weatherApi.getForecast(location, startDate, endDate);
+          setWeatherData(data);
+          setMaxWeeksFetched(weeksToFetch / 2); // Store how many pairs of weeks we've fetched
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -39,7 +49,7 @@ const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
     };
 
     fetchWeatherData();
-  }, [location, weekOffset, weatherData, maxWeeksFetched]);
+  }, [location, weekOffset, weatherData, maxWeeksFetched, isDevelopment]);
 
   const getEventDayForecast = () => {
     if (!weatherData) return null;
