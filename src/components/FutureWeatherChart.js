@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Paper, CircularProgress, useTheme, Typography } from '@mui/material';
+import { Box, Paper, CircularProgress, useTheme, Typography, useMediaQuery } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -26,6 +26,7 @@ ChartJS.register(
 
 const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const chartData = useMemo(() => {
     const eventDayData = getEventDayData(weatherData, eventDay, weekOffset, isNextWeek);
@@ -123,13 +124,15 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
         position: 'top',
         align: 'center',
         labels: {
-          padding: 20,
+          padding: isMobile ? 10 : 20,
           usePointStyle: true,
           pointStyle: 'circle',
           font: {
-            size: 12,
+            size: isMobile ? 10 : 12,
             weight: 'bold',
           },
+          boxWidth: isMobile ? 8 : 12,
+          boxHeight: isMobile ? 8 : 12,
         },
       },
       tooltip: {
@@ -138,15 +141,15 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
         bodyColor: theme.palette.text.secondary,
         borderColor: theme.palette.divider,
         borderWidth: 1,
-        padding: 12,
-        boxPadding: 6,
+        padding: isMobile ? 8 : 12,
+        boxPadding: isMobile ? 4 : 6,
         usePointStyle: true,
         titleFont: {
-          size: 14,
+          size: isMobile ? 12 : 14,
           weight: 'bold',
         },
         bodyFont: {
-          size: 13,
+          size: isMobile ? 11 : 13,
         },
         callbacks: {
           title: (items) => items[0].label,
@@ -175,7 +178,7 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           text: 'Temperature (°F)',
           color: theme.palette.error.main,
           font: {
-            size: 12,
+            size: isMobile ? 10 : 12,
             weight: 'bold',
           },
         },
@@ -184,8 +187,8 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           drawBorder: false,
         },
         ticks: {
-          font: { size: 11 },
-          padding: 8,
+          font: { size: isMobile ? 9 : 11 },
+          padding: isMobile ? 4 : 8,
           callback: (value) => `${value}°F`,
         },
         suggestedMin: (context) => {
@@ -206,7 +209,7 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           text: 'Percentage (%)',
           color: theme.palette.info.main,
           font: {
-            size: 12,
+            size: isMobile ? 10 : 12,
             weight: 'bold',
           },
         },
@@ -215,8 +218,8 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           drawBorder: false,
         },
         ticks: {
-          font: { size: 11 },
-          padding: 8,
+          font: { size: isMobile ? 9 : 11 },
+          padding: isMobile ? 4 : 8,
           callback: (value) => `${value}%`,
         },
         min: 0,
@@ -231,7 +234,7 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           text: 'Wind Speed (mph)',
           color: theme.palette.warning.main,
           font: {
-            size: 12,
+            size: isMobile ? 10 : 12,
             weight: 'bold',
           },
         },
@@ -240,8 +243,8 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           drawBorder: false,
         },
         ticks: {
-          font: { size: 11 },
-          padding: 8,
+          font: { size: isMobile ? 9 : 11 },
+          padding: isMobile ? 4 : 8,
           callback: (value) => `${value} mph`,
         },
         min: 0,
@@ -251,8 +254,8 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           display: false,
         },
         ticks: {
-          font: { size: 11 },
-          padding: 8,
+          font: { size: isMobile ? 9 : 11 },
+          padding: isMobile ? 4 : 8,
         },
         offset: true,
         min: -0.5,
@@ -279,12 +282,20 @@ const FutureWeatherChart = ({ weatherData, eventDay, isNextWeek, weekOffset }) =
           display: 'block',
           color: theme.palette.text.secondary,
           mb: 1,
-          fontStyle: 'italic'
+          fontStyle: 'italic',
+          fontSize: isMobile ? '0.7rem' : '0.75rem',
+          px: isMobile ? 1 : 0
         }}
       >
         * Based on historical weather averages for this time period
       </Typography>
-      <Box className="weather-chart-wrapper" sx={{ px: 4 }}>
+      <Box 
+        className="weather-chart-wrapper" 
+        sx={{ 
+          px: isMobile ? 1 : 4,
+          height: isMobile ? '300px' : '400px'
+        }}
+      >
         <Line options={options} data={chartData} />
       </Box>
     </Paper>
