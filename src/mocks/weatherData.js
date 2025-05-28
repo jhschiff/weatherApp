@@ -91,7 +91,8 @@ const generateMockData = () => {
       icon: conditions,
       sunrise: sunrise,
       sunset: sunset,
-      hours: generateHourlyData(temp, conditions, date)
+      hours: generateHourlyData(temp, conditions, date),
+      windspeed: windspeed
     });
   }
 
