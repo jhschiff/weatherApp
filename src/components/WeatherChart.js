@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { format, addDays, isAfter, startOfDay } from 'date-fns';
+import { format } from 'date-fns';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
@@ -28,7 +28,7 @@ ChartJS.register(
   Legend
 );
 
-const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek }) => {
+const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset }) => {
   const theme = useTheme();
 
   const chartData = useMemo(() => {
@@ -37,18 +37,21 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek }) => {
       return null;
     }
 
-    // Find the next two occurrences of the selected event day
-    const today = startOfDay(new Date());
+    // Find all matching days for the selected event day
     const matchingDays = weatherData.days
       .filter(day => {
         const dayDate = new Date(day.datetime);
         const dayOfWeek = format(dayDate, 'EEEE').toLowerCase();
-        return dayOfWeek === eventDay && isAfter(dayDate, today);
+        return dayOfWeek === eventDay;
       })
-      .slice(0, 2); // Get only the next two occurrences
+      .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 
-    // Select the appropriate day based on isNextWeek
-    const eventDayData = isNextWeek ? matchingDays[1] : matchingDays[0];
+    // Calculate the index based on weekOffset and isNextWeek
+    const baseIndex = weekOffset;
+    const index = baseIndex + (isNextWeek ? 1 : 0);
+
+    // Get the appropriate day
+    const eventDayData = matchingDays[index];
 
     if (!eventDayData?.hours) {
       console.log('No hours data for selected day');
@@ -163,7 +166,7 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek }) => {
         avgWind,
       }
     };
-  }, [weatherData, eventDay, timeRange, theme, isNextWeek]);
+  }, [weatherData, eventDay, timeRange, theme, isNextWeek, weekOffset]);
 
   const options = {
     responsive: true,
@@ -326,7 +329,7 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek }) => {
           gutterBottom
           className="weather-chart-title"
         >
-          {isNextWeek ? 'Next Week' : 'This Week'} - {format(new Date(chartData.date), 'EEEE, MMMM d')}
+          {format(new Date(chartData.date), 'EEEE, MMMM d')}
         </Typography>
         <Typography 
           variant="body1" 

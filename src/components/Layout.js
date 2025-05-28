@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, Alert, CircularProgress, Fade, Grid } from '@mui/material';
+import { Container, Box, Typography, Alert, CircularProgress, Fade, Grid, Button, ButtonGroup } from '@mui/material';
 import WeatherChart from './WeatherChart';
 import Search from './LocationSearch';
 import useWeather from '../hooks/useWeather';
@@ -9,11 +9,13 @@ const Layout = () => {
   const [location, setLocation] = useState('');
   const [eventDay, setEventDay] = useState('friday');
   const [timeRange, setTimeRange] = useState('afternoon');
+  const [weekOffset, setWeekOffset] = useState(0);
 
   const { weatherData, loading, error } = useWeather(
     location,
     eventDay,
-    timeRange
+    timeRange,
+    weekOffset
   );
 
   const handleLocationSearch = (newLocation) => {
@@ -26,6 +28,19 @@ const Layout = () => {
 
   const handleTimeRangeChange = (newTimeRange) => {
     setTimeRange(newTimeRange);
+  };
+
+  const handlePreviousWeeks = () => {
+    setWeekOffset(prev => Math.max(0, prev - 2));
+  };
+
+  const handleNextWeeks = () => {
+    setWeekOffset(prev => prev + 2);
+  };
+
+  const getWeekRangeText = () => {
+    if (weekOffset === 0) return 'Current Two Weeks';
+    return `Weeks ${weekOffset + 1}-${weekOffset + 2}`;
   };
 
   return (
@@ -75,6 +90,24 @@ const Layout = () => {
         ) : weatherData ? (
           <Fade in={true}>
             <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                <ButtonGroup variant="contained" aria-label="week navigation">
+                  <Button
+                    onClick={handlePreviousWeeks}
+                    disabled={weekOffset === 0}
+                  >
+                    Previous Two Weeks
+                  </Button>
+                  <Button
+                    onClick={handleNextWeeks}
+                  >
+                    Next Two Weeks
+                  </Button>
+                </ButtonGroup>
+              </Box>
+              <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
+                {getWeekRangeText()}
+              </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <WeatherChart
@@ -82,6 +115,7 @@ const Layout = () => {
                     eventDay={eventDay}
                     timeRange={timeRange}
                     isNextWeek={false}
+                    weekOffset={weekOffset}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -90,6 +124,7 @@ const Layout = () => {
                     eventDay={eventDay}
                     timeRange={timeRange}
                     isNextWeek={true}
+                    weekOffset={weekOffset}
                   />
                 </Grid>
               </Grid>

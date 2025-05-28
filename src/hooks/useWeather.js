@@ -2,26 +2,35 @@ import { useState, useEffect } from 'react';
 import { format, addDays } from 'date-fns';
 import weatherApi from '../services/weatherApi';
 
-const useWeather = (location, eventDay, timeRange) => {
+const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [maxWeeksFetched, setMaxWeeksFetched] = useState(0);
 
+  // Fetch data when location changes or when we need more future data
   useEffect(() => {
     const fetchWeatherData = async () => {
       if (!location) return;
+
+      // If we already have enough data for the requested weekOffset, don't fetch
+      if (weatherData && weekOffset < maxWeeksFetched) {
+        return;
+      }
 
       setLoading(true);
       setError(null);
 
       try {
-        // Calculate date range (current week and next week)
+        // Calculate how many weeks of data we need based on weekOffset
+        const weeksToFetch = Math.max(4, 4 + weekOffset);
         const today = new Date();
         const startDate = format(today, 'yyyy-MM-dd');
-        const endDate = format(addDays(today, 14), 'yyyy-MM-dd');
+        const endDate = format(addDays(today, weeksToFetch * 7), 'yyyy-MM-dd');
 
         const data = await weatherApi.getForecast(location, startDate, endDate);
         setWeatherData(data);
+        setMaxWeeksFetched(weeksToFetch / 2); // Store how many pairs of weeks we've fetched
       } catch (err) {
         setError(err.message);
       } finally {
@@ -30,7 +39,7 @@ const useWeather = (location, eventDay, timeRange) => {
     };
 
     fetchWeatherData();
-  }, [location, eventDay, timeRange]);
+  }, [location, weekOffset, weatherData, maxWeeksFetched]);
 
   const getEventDayForecast = () => {
     if (!weatherData) return null;
