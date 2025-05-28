@@ -25,6 +25,14 @@ EventCast is a modern web application that helps users plan outdoor events by pr
 
 - Node.js (v14 or higher)
 - npm or yarn
+- Visual Crossing Weather API key
+
+### Environment Variables
+
+Create a `.env` file in the root directory with your API key:
+```
+REACT_APP_VISUAL_CROSSING_API_KEY=your_api_key_here
+```
 
 ### Installation
 
@@ -56,6 +64,14 @@ The app will be available at `http://localhost:3000`
 2. Select your preferred event day (Monday through Sunday)
 3. Choose a time range (Morning, Afternoon, or Evening)
 4. View the detailed weather forecast with interactive charts
+
+### Data Fetching
+
+The app fetches weather data in the following way:
+- Initial fetch includes 4 weeks of data
+- Additional data is fetched automatically when viewing future weeks
+- Data is cached to prevent unnecessary API calls
+- Mock data is available for development (disabled by default)
 
 ## Project Structure
 
