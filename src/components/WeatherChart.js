@@ -16,6 +16,7 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
+import { getWeatherDescription, getTimeRangeHours, getEventDayData } from '../utils/weatherUtils';
 import '../styles/WeatherChart.css';
 
 ChartJS.register(
@@ -32,51 +33,15 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset
   const theme = useTheme();
 
   const chartData = useMemo(() => {
-    if (!weatherData?.days) {
-      console.log('No weather data available');
-      return null;
-    }
+    const eventDayData = getEventDayData(weatherData, eventDay, weekOffset, isNextWeek);
 
-    // Find all matching days for the selected event day
-    const matchingDays = weatherData.days
-      .filter(day => {
-        const dayDate = new Date(day.datetime);
-        const dayOfWeek = format(dayDate, 'EEEE').toLowerCase();
-        return dayOfWeek === eventDay;
-      })
-      .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-
-    // Calculate the index based on weekOffset and isNextWeek
-    const baseIndex = weekOffset;
-    const index = baseIndex + (isNextWeek ? 1 : 0);
-
-    // Get the appropriate day
-    const eventDayData = matchingDays[index];
-
-    if (!eventDayData?.hours) {
-      console.log('No hours data for selected day');
+    if (!eventDayData || !eventDayData.hours){
+      console.log('No data or no hours data for selected day');
       return null;
     }
 
     // Get the appropriate hours based on time range
-    let startHour, endHour;
-    switch (timeRange) {
-      case 'morning':
-        startHour = 8;
-        endHour = 12;
-        break;
-      case 'afternoon':
-        startHour = 12;
-        endHour = 17;
-        break;
-      case 'evening':
-        startHour = 17;
-        endHour = 21;
-        break;
-      default:
-        startHour = 12;
-        endHour = 17;
-    }
+    const { startHour, endHour } = getTimeRangeHours(timeRange);
 
     // Filter hours for the selected time range
     const filteredHours = eventDayData.hours.filter(hour => {
@@ -310,17 +275,6 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset
     );
   }
 
-  const getWeatherDescription = () => {
-    const { avgTemp, avgPrecip, avgHumidity, avgWind } = chartData.summary;
-    
-    const tempDesc = avgTemp > 75 ? 'warm' : avgTemp > 60 ? 'mild' : 'cool';
-    const precipDesc = avgPrecip > 50 ? 'high chance of precipitation' : avgPrecip > 20 ? 'some chance of precipitation' : 'low chance of precipitation';
-    const windDesc = avgWind > 15 ? 'windy' : avgWind > 8 ? 'breezy' : 'calm';
-    const humidityDesc = avgHumidity > 70 ? 'humid' : avgHumidity > 40 ? 'moderate humidity' : 'dry';
-
-    return `${tempDesc}, ${precipDesc}, ${windDesc} and ${humidityDesc}.`;
-  };
-
   return (
     <Paper elevation={3} className="weather-chart-container">
       <Box className="weather-chart-header">
@@ -335,7 +289,7 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset
           variant="body1" 
           className="weather-chart-description"
         >
-          {getWeatherDescription()}
+          {getWeatherDescription(chartData.summary)}
         </Typography>
         <Grid container spacing={2} className="weather-stats-grid">
           <Grid item xs={6} sm={3}>

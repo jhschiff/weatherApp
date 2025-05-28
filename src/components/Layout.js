@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Box, Typography, Alert, CircularProgress, Fade, Grid, Button, ButtonGroup } from '@mui/material';
 import WeatherChart from './WeatherChart';
+import FutureWeatherChart from './FutureWeatherChart';
 import Search from './LocationSearch';
 import useWeather from '../hooks/useWeather';
 import '../styles/Layout.css';
@@ -42,6 +43,8 @@ const Layout = () => {
     if (weekOffset === 0) return 'Current Two Weeks';
     return `Weeks ${weekOffset + 1}-${weekOffset + 2}`;
   };
+
+  const ChartComponent = weekOffset === 0 ? WeatherChart : FutureWeatherChart;
 
   return (
     <Container maxWidth="xl">
@@ -110,7 +113,7 @@ const Layout = () => {
               </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <WeatherChart
+                  <ChartComponent
                     weatherData={weatherData}
                     eventDay={eventDay}
                     timeRange={timeRange}
@@ -119,7 +122,7 @@ const Layout = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <WeatherChart
+                  <ChartComponent
                     weatherData={weatherData}
                     eventDay={eventDay}
                     timeRange={timeRange}
