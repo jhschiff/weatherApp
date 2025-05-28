@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 export const getWeatherDescription = (summary) => {
   const { avgTemp, avgPrecip, avgHumidity, avgWind } = summary;
@@ -33,11 +33,11 @@ export const getEventDayData = (weatherData, eventDay, weekOffset, isNextWeek) =
   // Find all matching days for the selected event day
   const matchingDays = weatherData.days
     .filter(day => {
-      const dayDate = new Date(day.datetime);
+      const dayDate = parseISO(day.datetime);
       const dayOfWeek = format(dayDate, 'EEEE').toLowerCase();
       return dayOfWeek === eventDay;
     })
-    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+    .sort((a, b) => parseISO(a.datetime) - parseISO(b.datetime));
 
   // Calculate the index based on weekOffset and isNextWeek
   const baseIndex = weekOffset;

@@ -11,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import CloudIcon from '@mui/icons-material/Cloud';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
@@ -283,7 +283,7 @@ const WeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, weekOffset
           gutterBottom
           className="weather-chart-title"
         >
-          {format(new Date(chartData.date), 'EEEE, MMMM d')}
+          {format(parseISO(chartData.date), 'EEEE, MMMM d')}
         </Typography>
         <Typography 
           variant="body1" 
