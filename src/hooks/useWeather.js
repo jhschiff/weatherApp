@@ -10,7 +10,8 @@ const useWeather = (location, weekOffset = 0) => {
   const [maxWeeksFetched, setMaxWeeksFetched] = useState(0);
 
   // Use mock data in development
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  // const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = false
 
   // Fetch data when location changes or when we need more future data
   useEffect(() => {

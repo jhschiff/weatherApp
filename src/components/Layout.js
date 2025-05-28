@@ -14,8 +14,6 @@ const Layout = () => {
 
   const { weatherData, loading, error } = useWeather(
     location,
-    eventDay,
-    timeRange,
     weekOffset
   );
 
@@ -49,22 +47,24 @@ const Layout = () => {
   return (
     <Container maxWidth="xl">
       <Box sx={{ my: 4 }}>
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          gutterBottom 
-          align="center"
-          className="title"
-        >
-          EventCast
-        </Typography>
-        <Typography
-          variant="h6"
-          align="center"
-          className="subtitle"
-        >
-          Weather insights for perfect outdoor plans
-        </Typography>
+        <div className="header-container">
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            gutterBottom 
+            align="center"
+            className="title"
+          >
+            EventCast
+          </Typography>
+          <Typography
+            variant="h6"
+            align="center"
+            className="subtitle"
+          >
+            Weather insights for perfect outdoor plans
+          </Typography>
+        </div>
         
         {error && (
           <Alert 

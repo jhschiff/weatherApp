@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Paper, CircularProgress, useTheme } from '@mui/material';
+import { Box, Paper, CircularProgress, useTheme, Typography } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -147,6 +147,18 @@ const FutureWeatherChart = ({ weatherData, eventDay, timeRange, isNextWeek, week
   return (
     <Paper elevation={3} className="weather-chart-container">
       <WeatherChartHeader chartData={chartData} theme={theme} />
+      <Typography 
+        variant="caption" 
+        sx={{ 
+          textAlign: 'center', 
+          display: 'block',
+          color: theme.palette.text.secondary,
+          mb: 1,
+          fontStyle: 'italic'
+        }}
+      >
+        * Based on historical weather averages for this time period
+      </Typography>
       <Box className="weather-chart-wrapper">
         <Bar options={options} data={chartData} />
       </Box>
