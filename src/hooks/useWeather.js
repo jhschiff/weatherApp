@@ -3,7 +3,7 @@ import { format, addDays } from 'date-fns';
 import weatherApi from '../services/weatherApi';
 import mockWeatherData from '../mocks/weatherData';
 
-const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
+const useWeather = (location, weekOffset = 0) => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,37 +51,10 @@ const useWeather = (location, eventDay, timeRange, weekOffset = 0) => {
     fetchWeatherData();
   }, [location, weekOffset, weatherData, maxWeeksFetched, isDevelopment]);
 
-  const getEventDayForecast = () => {
-    if (!weatherData) return null;
-
-    // Find the forecast for the selected event day
-    const eventDayData = weatherData.days.find(day => {
-      const dayOfWeek = format(new Date(day.datetime), 'EEEE').toLowerCase();
-      return dayOfWeek === eventDay;
-    });
-
-    return eventDayData;
-  };
-
-  const getNextWeekEventDayForecast = () => {
-    if (!weatherData) return null;
-
-    // Find the forecast for the selected event day in the next week
-    const nextWeekEventDayData = weatherData.days.find(day => {
-      const dayOfWeek = format(new Date(day.datetime), 'EEEE').toLowerCase();
-      const isNextWeek = new Date(day.datetime) > addDays(new Date(), 7);
-      return dayOfWeek === eventDay && isNextWeek;
-    });
-
-    return nextWeekEventDayData;
-  };
-
   return {
     weatherData,
     loading,
     error,
-    getEventDayForecast,
-    getNextWeekEventDayForecast,
   };
 };
 
