@@ -9,8 +9,9 @@ const useWeather = (location, weekOffset = 0) => {
   const [error, setError] = useState(null);
   const [maxWeeksFetched, setMaxWeeksFetched] = useState(0);
   const weatherDataRef = useRef(weatherData);
+  const previousLocationRef = useRef(location);
 
-  // Update ref when weatherData changes
+  // Update refs when values change
   useEffect(() => {
     weatherDataRef.current = weatherData;
   }, [weatherData]);
@@ -23,8 +24,8 @@ const useWeather = (location, weekOffset = 0) => {
     const fetchWeatherData = async () => {
       if (!location) return;
 
-      // If we already have enough data for the requested weekOffset, don't fetch
-      if (weatherDataRef.current && weekOffset < maxWeeksFetched) {
+      // If location hasn't changed and we have enough data for the weekOffset, don't fetch
+      if (location === previousLocationRef.current && weatherDataRef.current && weekOffset < maxWeeksFetched) {
         return;
       }
 
@@ -40,12 +41,6 @@ const useWeather = (location, weekOffset = 0) => {
           // Calculate how many weeks of data we need based on weekOffset
           const weeksToFetch = Math.max(4, 4 + weekOffset);
           
-          // If we already have enough data, don't fetch again
-          if (weatherDataRef.current && maxWeeksFetched >= weeksToFetch) {
-            setLoading(false);
-            return;
-          }
-
           const today = new Date();
           const startDate = format(today, 'yyyy-MM-dd');
           const endDate = format(addDays(today, weeksToFetch * 7), 'yyyy-MM-dd');
@@ -62,7 +57,9 @@ const useWeather = (location, weekOffset = 0) => {
     };
 
     fetchWeatherData();
-  }, [location, weekOffset, maxWeeksFetched, isDevelopment]);
+    // Update previous location after the fetch
+    previousLocationRef.current = location;
+  }, [location, weekOffset, isDevelopment, maxWeeksFetched]);
 
   return {
     weatherData,

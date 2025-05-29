@@ -11,14 +11,18 @@ const Layout = () => {
   const [eventDay, setEventDay] = useState('friday');
   const [timeRange, setTimeRange] = useState('afternoon');
   const [weekOffset, setWeekOffset] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
 
   const { weatherData, loading, error } = useWeather(
     location,
     weekOffset
   );
 
-  const handleLocationSearch = (newLocation) => {
+  const handleLocationSearch = async (newLocation) => {
+    setIsSearching(true);
     setLocation(newLocation);
+    // Reset searching state after a short delay to ensure loading state is visible
+    setTimeout(() => setIsSearching(false), 500);
   };
 
   const handleEventDayChange = (newDay) => {
@@ -83,6 +87,7 @@ const Layout = () => {
             timeRange={timeRange}
             onEventDayChange={handleEventDayChange}
             onTimeRangeChange={handleTimeRangeChange}
+            isLoading={isSearching || loading}
           />
         </Box>
 

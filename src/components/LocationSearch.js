@@ -6,9 +6,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import '../styles/LocationSearch.css';
 
-const Search = ({ onSearch, eventDay, timeRange, onEventDayChange, onTimeRangeChange }) => {
-  const [location, setLocation] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+const Search = ({ onSearch, eventDay, timeRange, onEventDayChange, onTimeRangeChange, isLoading }) => {
+  const [inputValue, setInputValue] = useState('');
 
   const days = [
     { value: 'monday', label: 'Monday' },
@@ -28,11 +27,9 @@ const Search = ({ onSearch, eventDay, timeRange, onEventDayChange, onTimeRangeCh
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!location.trim()) return;
+    if (!inputValue.trim()) return;
     
-    setIsLoading(true);
-    onSearch(location.trim());
-    setIsLoading(false);
+    onSearch(inputValue.trim());
   };
 
   return (
@@ -51,8 +48,8 @@ const Search = ({ onSearch, eventDay, timeRange, onEventDayChange, onTimeRangeCh
             fullWidth
             label="Enter Location"
             variant="outlined"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             placeholder="e.g., Central Park, New York"
             disabled={isLoading}
             className="search-input"
@@ -69,7 +66,7 @@ const Search = ({ onSearch, eventDay, timeRange, onEventDayChange, onTimeRangeCh
             type="submit"
             startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
             className="search-button"
-            disabled={isLoading || !location.trim()}
+            disabled={isLoading || !inputValue.trim()}
           >
             {isLoading ? 'Searching...' : 'Search'}
           </Button>
