@@ -116,8 +116,8 @@ const Layout = () => {
               <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
                 {getWeekRangeText()}
               </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
+              <Grid container spacing={3} sx={{ maxWidth: '1400px', mx: 'auto', justifyContent: 'center' }}>
+                <Grid item xs={12} md={8} lg={6}>
                   <ChartComponent
                     weatherData={weatherData}
                     eventDay={eventDay}
@@ -126,7 +126,7 @@ const Layout = () => {
                     weekOffset={weekOffset}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} md={8} lg={6}>
                   <ChartComponent
                     weatherData={weatherData}
                     eventDay={eventDay}
